@@ -28,200 +28,244 @@
       display: block;
     }
 
-    .sidenav a:hover {
-      color: #064579;
-    }
+    .sidenav a:hover { color: #064579; }
 
     .main {
-      margin-left: 140px; /* Same width as the sidebar + left position in px */
-      font-size: 28px; /* Increased text to enable scrolling */
+      margin-left: 140px;
+      font-size: 28px;
       padding: 0px 10px;
     }
-
-    @media screen and (max-height: 450px) {
-      .sidenav {padding-top: 15px;}
-      .sidenav a {font-size: 18px;}
-    }
-</style>
-
-  
+  </style>
 </head>
+
 <body>
 
 <div class="layout">
 
   <div class="sidenav">
-
-
-    <div class="hotel-safe">
-      <p><strong>Hotel Check In:</strong> <span id="Hotel_CheckIn"></span></p>
+    <div class="flight-safe">
+      <p><strong>Hinflug:</strong> <span id="Hinflug_Flight_Departure_1"></span></p>
       <div class="segment">
-        <p><strong>Hotel:</strong> <span id="Hotel_Name"></span></p>
-        <p><strong>Adresse:</strong> <span id="Hotel_Beschriebung"></span></p>
-        <p><strong>Preis:</strong> <span id="Hotel_Preis"></span></p>
+        <p><strong>Flugnummer:</strong> <span id="Hinflug_Flight_Number_1"></span></p>
+        <p><strong>Von:</strong> <span id="Hinflug_Flight_From_1"></span></p>
+        <p><strong>Nach:</strong> <span id="Hinflug_Flight_To_1"></span></p>
+        <p><strong>Preis:</strong> <span id="Hinflug_Flight_Price_1"></span></p>
       </div>
-      <p><strong>Hotel Check Out:</strong> <span id="Hotel_CheckOut"></span></p>
-    </div>
+    
+      <div class="hotel-safe">
+        <p><strong>Hotel Check In:</strong> <span id="Hotel_CheckIn"></span></p>
+        <div class="segment">
+          <p><strong>Hotel:</strong> <span id="Hotel_Name"></span></p>
+          <p><strong>Adresse:</strong> <span id="Hotel_Beschriebung"></span></p>
+          <p><strong>Preis:</strong> <span id="Hotel_Preis"></span></p>
+        </div>
+        <p><strong>Hotel Check Out:</strong> <span id="Hotel_CheckOut"></span></p>
+      </div>
 
- 
+      <p><strong>Rückflug:</strong> <span id="Rückflug_Flight_Departure_1"></span></p>
+      <div class="segment">
+        <p><strong>Flugnummer:</strong> <span id="Rückflug_Flight_Number_1"></span></p>
+        <p><strong>Von:</strong> <span id="Rückflug_Flight_From_1"></span></p>
+        <p><strong>Nach:</strong> <span id="Rückflug_Flight_To_1"></span></p>
+        <p><strong>Preis:</strong> <span id="Rückflug_Flight_Price_1"></span></p>
+      </div>
+
+
+    </div>  
   </div>
+
 
   <div class="content">
 
-    <!-- Dein Hauptinhalt: Formulare, Ergebnisse usw. -->
     <h1>Suchergebnisse</h1>
 
-  <!-- Formular für Flüge -->
-  <form action="/flight_list" method="get">
-    <h3>Flugsuche</h3>
-    <label>Abflugstadt:</label>
-    <input type="text" name="origin" required>
-    <label>Zielstadt:</label>
-    <input type="text" name="destination" required>
-    <label>Abflugdatum:</label>
-    <input type="date" name="departureDate" required>
-    <label>Rückflugdatum:</label>
-    <input type="date" name="returnDate">
-    <label>Nur Hinflug:</label>
-    <input type="checkbox" name="oneWay" value="true">
-    <input type="hidden" name="action" value="flight">
-    <button type="submit">Flüge suchen</button>
-  </form>
+    <!-- FORMULARE -->
+    <form action="/flight_list" method="get">
+      <h3>Flugsuche</h3>
+      <label>Abflugstadt:</label><input type="text" name="origin" required>
+      <label>Zielstadt:</label><input type="text" name="destination" required>
+      <label>Abflugdatum:</label><input type="date" name="departureDate" required>
+      <label>Rückflugdatum:</label><input type="date" name="returnDate">
+      <label>Nur Hinflug:</label><input type="checkbox" name="oneWay" value="true">
+      <input type="hidden" name="action" value="flight">
+      <button type="submit">Flüge suchen</button>
+    </form>
 
-  <!-- Formular für Hotels -->
-  <form action="/hotel_list" method="get">
-    <h3>Hotelsuche</h3>
-    <label>Stadt:</label>
-    <input type="text" name="hotelCity" required>
-    <label>Radius (km):</label>
-    <input type="number" name="radius" value="5">
-    <label>Bewertung:</label>
-    <input type="number" name="rating" min="1" max="5">
-    <label>Gäste:</label>
-    <input type="number" name="hotelGuests" value="1">
-    <label>Zimmer:</label>
-    <input type="number" name="hotelRoom" value="1">
-    <label>Check-In:</label>
-    <input type="date" name="hotelCheckIn" required>
-    <label>Check-Out:</label>
-    <input type="date" name="hotelCheckOut" required>
-    <input type="hidden" name="action" value="hotel">
-    <button type="submit">Hotels suchen</button>
-  </form>
+    <form action="/hotel_list" method="get">
+      <h3>Hotelsuche</h3>
+      <label>Stadt:</label><input type="text" name="hotelCity" required>
+      <label>Radius (km):</label><input type="number" name="radius" value="5">
+      <label>Bewertung:</label><input type="number" name="rating" min="1" max="5">
+      <label>Gäste:</label><input type="number" name="hotelGuests" value="1">
+      <label>Zimmer:</label><input type="number" name="hotelRoom" value="1">
+      <label>Check-In:</label><input type="date" name="hotelCheckIn" required>
+      <label>Check-Out:</label><input type="date" name="hotelCheckOut" required>
+      <input type="hidden" name="action" value="hotel">
+      <button type="submit">Hotels suchen</button>
+    </form>
 
-  <hr>
+    <hr>
 
-  <!-- Ergebnisse -->
-  <div id="results"></div>
+    <div id="results"></div>
 
-  <script>
-    const flights = {{ flights|tojson }};
-    const hotels = {{ hotels|tojson }};
-    const angebote_pro_hotel = {{ angebote_pro_hotel|tojson }};
-    const search_done = {{ search_done|tojson }};
-    
-    console.log("Flights:", flights);
-    console.log("Hotels:", hotels);
-    console.log("Angebote:", angebote_pro_hotel);
+<script>
+  const flights = {{ flights|tojson }};
+  const hotels = {{ hotels|tojson }};
+  const angebote_pro_hotel = {{ angebote_pro_hotel|tojson }};
+  const search_done = {{ search_done|tojson }};
 
-    // Deine Render-Funktion
-    function renderResults(search_done, flights, hotels, angebote_pro_hotel) {
-      let html = "";
+  function renderResults(search_done, flights, hotels, angebote_pro_hotel) {
+    let html = "";
 
-      if (search_done) {
-        // Flüge anzeigen
-        if (flights && flights.length > 0) {
-          html += "<h2>Gefundene Flüge:</h2>";
-          flights.forEach(flight => {
-            html += `<div class="flight-card">`;
-            flight.itineraries.forEach(itinerary => {
-              
-              html += `<p><strong>Reisedauer:</strong> ${itinerary.duration}</p>`;
-              itinerary.segments.forEach(segment => {
-                html += `
-                  <div class="segment">
-                    <p><strong>Flugnummer:</strong> ${segment.carrierCode} ${segment.number}</p>
-                    <p><strong>Abflug:</strong> ${segment.departure.iataCode} – ${segment.departure.at}</p>
-                    <p><strong>Ankunft:</strong> ${segment.arrival.iataCode} – ${segment.arrival.at}</p>
-                    <p><strong>Dauer:</strong> ${segment.duration}</p>
-                  </div>
-                `;
-              });
-            });
+    if (!search_done) return "";
 
-            html += `<p><strong>Endpreis:</strong> ${flight.price.total} ${flight.price.currency}</p>`;
-            if (flight.price.base) {
-              html += `<p><strong>Basispreis:</strong> ${flight.price.base}</p>`;
-            }
-            if (flight.price.fees && flight.price.fees.length > 0) {
-              html += `<h4>Zusätzliche Gebühren:</h4><ul>`;
-              flight.price.fees.forEach(fee => {
-                html += `<li>${fee.amount} ${flight.price.currency} – ${fee.type}</li>`;
-              });
-              html += `</ul>`;
-            }
+    /* ==========================
+       FLÜGE ANZEIGEN
+    ========================== */
+    if (flights && flights.length > 0) {
+      html += "<h2>Gefundene Flüge:</h2>";
 
-            html += `<input type="button" onclick="myFunction2('')" id="myBtn2" value="Speichern">`; 
-            html += `</div>`;
+      flights.forEach((flight, i) => {
+        html += `<div class="flight-card">`;
+
+        flight.itineraries.forEach((itinerary, j) => {
+          html += `<p><strong>Reisedauer:</strong> ${itinerary.duration}</p>`;
+
+          itinerary.segments.forEach(segment => {
+            html += `
+              <div class="segment">
+                <p><strong>Flugnummer:</strong> ${segment.carrierCode} ${segment.number}</p>
+                <p><strong>Abflug:</strong> ${segment.departure.iataCode} – ${segment.departure.at}</p>
+                <p><strong>Ankunft:</strong> ${segment.arrival.iataCode} – ${segment.arrival.at}</p>
+                <p><strong>Dauer:</strong> ${segment.duration}</p>
+              </div>
+            `;
           });
 
-        // Hotels anzeigen, wenn keine Flüge vorhanden sind
-        } else if (hotels && hotels.length > 0) {
-          html += "<h2>Gefundene Hotels mit verfügbaren Zimmern:</h2>";
-          hotels.forEach(hotel => {
-            const angebote = angebote_pro_hotel[hotel.hotelId] || [];
-            const hatZimmer = angebote.some(o => o.offers && o.offers.length > 0);
-            if (hatZimmer) {
-              html += `<div class="hotel-card">
-                <p><strong>Name:</strong> ${hotel.name}</p>
-                <p><strong>Bewertung:</strong> ${hotel.rating} Sterne</p>
-                <p><strong>Adresse:</strong> ${hotel.address.lines[0]}, ${hotel.address.cityName}</p>
-                <p><strong>Entfernung:</strong> ${hotel.distance.value} ${hotel.distance.unit}</p>
-                <p><strong>Angebote:</strong></p>
-              `;
-              angebote.forEach(offer => {
-                if (offer.offers) {
-                  offer.offers.forEach(einzelangebot => {
-                    html += `<div class="angebot-block">`;
-                    html += `<input type="button" onclick="myFunction('${hotel.name};${einzelangebot.price.total}', '${hotel.address.lines[0]}, ${hotel.address.cityName}', '${einzelangebot.checkInDate}', '${einzelangebot.checkOutDate}')" id="myBtn" value="Speichern">`; 
-                    if (einzelangebot.room.typeEstimated) {
-                      html += `<p><strong>Bett:</strong> ${einzelangebot.room.typeEstimated.bedType} × ${einzelangebot.room.typeEstimated.beds}</p>`;
-                    }
-                    if (einzelangebot.room.description) {
-                      html += `<p><strong>Beschreibung:</strong> ${einzelangebot.room.description.text}</p>`;
-                    }
-                    html += `<p><strong>Preis:</strong> ${einzelangebot.price.total} €</p><hr>`;
-                    html += `</div>`;
-                  });
-                }
-              });
-              html += `</div>`;
-            }
-          });
-        } else {
-          html += "<p>Keine Flüge oder Hotels gefunden.</p>";
-        }
-      }
+        html += `<p><strong>Endpreis:</strong> ${flight.price.total} ${flight.price.currency}</p>`;
+        });
+               /* FIXED: sichere Übergabe */
+        html += `<input type="button" id="myBtn2"
+                   onclick="saveFlight(flights[${i}])"
+                   value="Speichern">`;
+        html += `</div>`;
+      });
+
       return html;
     }
 
-    function myFunction(parms, parm2, parm3, parm4) {
-      // param ist der übergebene Wert
-      let parts = parms.split(";");
+    /* ==========================
+       HOTELS ANZEIGEN
+    ========================== */
+    if (hotels && hotels.length > 0) {
+      html += "<h2>Gefundene Hotels mit verfügbaren Zimmern:</h2>";
+      hotels.forEach(hotel => {
+        const angebote = angebote_pro_hotel[hotel.hotelId] || [];
+        const hatZimmer = angebote.some(o => o.offers && o.offers.length > 0);
 
-      document.getElementById("Hotel_CheckIn").innerHTML = parm3;
-      document.getElementById("Hotel_Name").innerHTML = parts[0];
-      document.getElementById("Hotel_Beschriebung").innerHTML = parm2;
-      document.getElementById("Hotel_Preis").innerHTML = parts[1];
-      document.getElementById("Hotel_CheckOut").innerHTML = parm4;
+        if (!hatZimmer) return;
 
+        html += `<div class="hotel-card">
+          <p><strong>Name:</strong> ${hotel.name}</p>
+          <p><strong>Bewertung:</strong> ${hotel.rating} Sterne</p>
+          <p><strong>Adresse:</strong> ${hotel.address.lines[0]}, ${hotel.address.cityName}</p>
+          <p><strong>Entfernung:</strong> ${hotel.distance.value} ${hotel.distance.unit}</p>
+          <p><strong>Angebote:</strong></p>
+        `;
+
+        angebote.forEach(offer => {
+          if (!offer.offers) return;
+
+          offer.offers.forEach(einzelangebot => {
+            html += `<div class="angebot-block">`;
+
+            html += `<input type="button" id="myBtn"
+                     onclick="myFunction('${hotel.name};${einzelangebot.price.total}',
+                                          '${hotel.address.lines[0]}, ${hotel.address.cityName}',
+                                          '${einzelangebot.checkInDate}',
+                                          '${einzelangebot.checkOutDate}')"
+                     value="Speichern">`;
+
+            if (einzelangebot.room.typeEstimated) {
+              html += `<p><strong>Bett:</strong> ${einzelangebot.room.typeEstimated.bedType} × ${einzelangebot.room.typeEstimated.beds}</p>`;
+            }
+
+            html += `<p><strong>Preis:</strong> ${einzelangebot.price.total} €</p><hr>`;
+            html += `</div>`;
+          });
+        });
+
+        html += `</div>`;
+      });
+
+      return html;
     }
 
-    // Ergebnisse ins DOM schreiben
-    document.getElementById("results").innerHTML =
-      renderResults(search_done, flights, hotels, angebote_pro_hotel);
-  </script>
+    return "<p>Keine Flüge oder Hotels gefunden.</p>";
+  }
 
+  /* ==========================
+     HOTEL SPEICHERN
+  ========================== */
+  function myFunction(parms, parm2, parm3, parm4) {
+    let parts = parms.split(";");
+
+    document.getElementById("Hotel_CheckIn").innerHTML = parm3;
+    document.getElementById("Hotel_Name").innerHTML = parts[0];
+    document.getElementById("Hotel_Beschriebung").innerHTML = parm2;
+    document.getElementById("Hotel_Preis").innerHTML = parts[1];
+    document.getElementById("Hotel_CheckOut").innerHTML = parm4;
+  }
+
+  /* ==========================
+     FLUG SPEICHERN
+  ========================== */
+  function saveFlight(flights) {
+
+    const Hinflug = flights.itineraries[0];
+
+    const Rückflug = flights.itineraries[1];
+
+   const Hinflug_segment_1 = Hinflug.segments[0]; 
+   const Rückflug_segment_1 = Rückflug.segments[0]; 
+
+    document.getElementById("Hinflug_Flight_Number_1").innerHTML =
+      Hinflug_segment_1.carrierCode + " " + Hinflug_segment_1.number;
+
+    document.getElementById("Hinflug_Flight_From_1").innerHTML =
+      Hinflug_segment_1.departure.iataCode + " – " + Hinflug_segment_1.departure.at;
+
+    document.getElementById("Hinflug_Flight_To_1").innerHTML =
+      Hinflug_segment_1.arrival.iataCode + " – " + Hinflug_segment_1.arrival.at;
+
+    document.getElementById("Hinflug_Flight_Departure_1").innerHTML =
+      Hinflug_segment_1.departure.at.substring(0, 10);
+
+    document.getElementById("Hinflug_Flight_Price_1").innerHTML =
+      "Preis wird oben angezeigt";
+
+
+    document.getElementById("Rückflug_Flight_Number_1").innerHTML =
+      Rückflug_segment_1.carrierCode + " " + Rückflug_segment_1.number;
+
+    document.getElementById("Rückflug_Flight_From_1").innerHTML =
+      Rückflug_segment_1.departure.iataCode + " – " + Rückflug_segment_1.departure.at;
+
+    document.getElementById("Rückflug_Flight_To_1").innerHTML =
+      Rückflug_segment_1.arrival.iataCode + " – " + Rückflug_segment_1.arrival.at;
+
+    document.getElementById("Rückflug_Flight_Departure_1").innerHTML =
+      Rückflug_segment_1.departure.at.substring(0, 10);
+
+    document.getElementById("Rückflug_Flight_Price_1").innerHTML =
+      "Preis wird oben angezeigt";
+
+
+  }
+
+  document.getElementById("results").innerHTML =
+    renderResults(search_done, flights, hotels, angebote_pro_hotel);
+</script>
 
   </div>
 </div>
