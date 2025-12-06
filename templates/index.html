@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>SmartTrip – Flugsuche</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <h1>SmartTrip – Flugsuche</h1>
+  <form method="POST" action="/search" id="flight-form">
+    <input type="text" name="origin" placeholder="Abflugort (z. B. FRA)" required>
+    <input type="text" name="destination" placeholder="Zielort (z. B. BCN)" required>
+    <input type="date" name="date" required>
+    <button type="submit">Suchen</button>
+  </form>
+  <pre id="results"></pre>
+
+  <script>
+    document.getElementById("flight-form").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const response = await fetch("/search", {
+        method: "POST",
+        body: formData
+      });
+      const data = await response.json();
+      document.getElementById("results").textContent = JSON.stringify(data, null, 2);
+    });
+  </script>
+</body>
+</html>
