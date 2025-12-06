@@ -18,7 +18,7 @@ def get_access_token():
     response = requests.post(url, data=payload)
     return response.json()["access_token"]
 
-@app.route("/", methods=["GET"])
+@app.route("/", methods=["GET", "POST"])
 def index():
     action = ''
     action = request.form.get("action")
@@ -30,15 +30,55 @@ def index():
             # Hotelsuche ausführen
             return hotel_list()
         case _:
-            return render_template(
-            "index.html",
-            flights=[],
-            hotels=[],
-            angebote_pro_hotel={},
-            search_done=False
-        )
+            return flight_list()
 
 
+# Startseite mit Formular und optionalen Flugdaten
+@app.route("/", methods=["GET", "POST"])
+def flight_list():
+    flights = []
+    search_done = False  # ← Flag setzen
+
+    if request.method == "POST":
+        search_done = True  # ← Suche wurde gemacht
+        #origin = request.form.get("origin")
+        origin = get_city_iata_code(request.form.get("origin"))
+        #destination = request.form.get("destination")
+        destination = get_city_iata_code(request.form.get("destination"))
+        departure_date = request.form.get("departureDate")
+        return_date = request.form.get("returnDate")
+        one_way = request.form.get("oneWay")
+
+        try:
+            token = get_access_token()
+            url = "https://test.api.amadeus.com/v2/shopping/flight-offers"
+            headers = {"Authorization": f"Bearer {token}"}
+            params = {
+                "originLocationCode": origin,
+                "destinationLocationCode": destination,
+                "departureDate": departure_date,
+                "adults": 1,
+                "max": 5
+            }
+
+            if not one_way and return_date:
+                params["returnDate"] = return_date
+
+            response = requests.get(url, headers=headers, params=params)
+            response.raise_for_status()
+            data = response.json()
+
+            if "data" in data:
+                flights = data["data"]
+
+        except Exception as e:
+            print("Fehler bei der API-Abfrage:", e)
+
+    return render_template("index.html", flights=flights, search_done=search_done)
+    
+
+
+@app.route("/price", methods=["POST"])
 def price():
     import json
 
@@ -92,6 +132,7 @@ def price():
 
     return render_template("price.html", pricing=pricing_data)
 
+@app.route("/get_city_iata_code", methods=["GET"])
 def get_city_iata_code(city_name):
     token = get_access_token()
     url = "https://test.api.amadeus.com/v1/reference-data/locations/cities"
@@ -111,7 +152,7 @@ def fetch_hotel_offers(hotels, anzahl, checkIn, checkOut, raumAnzahl):
     token = get_access_token()
     url = "https://test.api.amadeus.com/v3/shopping/hotel-offers"
     headers = {"Authorization": f"Bearer {token}"}
-    hotel_ids = [hotel["hotelId"] for hotel in hotels][:20]
+    hotel_ids = [hotel["hotelId"] for hotel in hotels]
     params = {
         "hotelIds": hotel_ids,
         "adults": anzahl,
@@ -130,20 +171,17 @@ def fetch_hotel_offers(hotels, anzahl, checkIn, checkOut, raumAnzahl):
 
 @app.route("/hotel_list", methods=["GET"])
 def hotel_list():
-    city_name = request.args.get("hotelCity")
-    radius = request.args.get("radius")
-    rating = request.args.get("rating", 5)
-    anzahl = request.args.get("hotelGuests", 1)
-    checkIn = request.args.get("hotelCheckIn")
-    checkOut = request.args.get("hotelCheckOut")
-    raumAnzahl = request.args.get("hotelRoom", 1)
+    city_name = request.form.get("hotelCity")
+    radius = request.form.get("radius")
+    rating = request.form.get("rating")
+    anzahl = request.form.get("hotelGuests", 1)
+    checkIn = request.form.get("hotelCheckIn")
+    checkOut = request.form.get("hotelCheckOut")
+    raumAnzahl = request.form.get("hotelRoom", 1)
 
-    
-    if not city_name:
-        city_code = get_city_iata_code("Berlin")
-    else:
-        city_code = get_city_iata_code(city_name)
-        
+    city_code = get_city_iata_code(city_name)
+    if not city_code:
+        return "Stadt nicht gefunden", 404
 
     token = get_access_token()
     url = "https://test.api.amadeus.com/v1/reference-data/locations/hotels/by-city"
@@ -172,54 +210,11 @@ def hotel_list():
             hotels_mit_zimmer.append(hotel)
 
     return render_template(
-        "index.html",
-        flights=[],  # keine Flüge hier
-        hotels=hotels_mit_zimmer,
-        angebote_pro_hotel=angebote_pro_hotel,
-        search_done=True
-    )
-
-@app.route("/flight_list", methods=["GET"])
-def flight_list():
-    flights = []
-    search_done = False
-
-    if request.method == "GET":
-        search_done = True
-        origin = get_city_iata_code(request.args.get("origin"))
-        destination = get_city_iata_code(request.args.get("destination"))
-        departure_date = request.args.get("departureDate")
-        return_date = request.args.get("returnDate")
-        one_way = request.args.get("oneWay")
-
-        try:
-            token = get_access_token()
-            url = "https://test.api.amadeus.com/v2/shopping/flight-offers"
-            headers = {"Authorization": f"Bearer {token}"}
-            params = {
-                "originLocationCode": origin,
-                "destinationLocationCode": destination,
-                "departureDate": departure_date,
-                "adults": 1,
-                "max": 5
-            }
-            if not one_way and return_date:
-                params["returnDate"] = return_date
-
-            response = requests.get(url, headers=headers, params=params)
-            response.raise_for_status()
-            data = response.json()
-            flights = data.get("data", [])
-
-        except Exception as e:
-            print("Fehler bei der API-Abfrage:", e)
-
-    return render_template(
-        "index.html",
-        flights=flights,
-        hotels=[],
-        angebote_pro_hotel={},
-        search_done=search_done
+    "index.html",
+    flights=[],
+    hotels=hotels_mit_zimmer,
+    angebote_pro_hotel=angebote_pro_hotel,
+    search_done=True
     )
 
 

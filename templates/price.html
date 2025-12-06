@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Preisdetails</title>
+</head>
+<body>
+  <h1>Preisdetails</h1>
+
+  {% if pricing['data'] %}
+    {% set offer = pricing['data']['flightOffers'][0] %}
+    <p><strong>Gesamtpreis:</strong> {{ offer['price']['total'] }} {{ offer['price']['currency'] }}</p>
+    <p><strong>Basispreis:</strong> {{ offer['price']['base'] }}</p>
+
+    {% if offer['price']['fees'] %}
+      <h3>Zusätzliche Gebühren:</h3>
+      <ul>
+        {% for fee in offer['price']['fees'] %}
+          <li>{{ fee['amount'] }} {{ offer['price']['currency'] }} – {{ fee['type'] }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% else %}
+    <p>Keine Preisdaten erhalten.</p>
+  {% endif %}
+
+  <a href="/">Zurück zur Suche</a>
+</body>
+</html>
