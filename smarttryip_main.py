@@ -1,7 +1,10 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_file
 import requests
 import os
 from dotenv import load_dotenv
+from reportlab.platypus import SimpleDocTemplate, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.pagesizes import A4 
 
 load_dotenv()
 
@@ -221,6 +224,44 @@ def flight_list():
         angebote_pro_hotel={},
         search_done=search_done
     )
+
+
+
+@app.post("/download_pdf")
+def download_pdf():
+    data = request.get_json()
+
+    filename = "reise_details.pdf"
+    doc = SimpleDocTemplate(filename, pagesize=A4)
+    styles = getSampleStyleSheet()
+    content = []
+
+    def add(title, text):
+        content.append(Paragraph(f"<b>{title}</b><br/>{text}<br/><br/>", styles["Normal"]))
+
+    add("Hinflug – Datum", data["hinflug"]["datum"])
+    add("Hinflug – Preis", data["hinflug"]["preis"])
+    add("Hinflug – Segmente", data["hinflug"]["segmente"])
+
+    add("Rückflug – Datum", data["rueckflug"]["datum"])
+    add("Rückflug – Preis", data["rueckflug"]["preis"])
+    add("Rückflug – Segmente", data["rueckflug"]["segmente"])
+
+    add("Hotel – Name", data["hotel"]["name"])
+    add("Hotel – Adresse", data["hotel"]["adresse"])
+    add("Hotel – CheckIn", data["hotel"]["checkin"])
+    add("Hotel – CheckOut", data["hotel"]["checkout"])
+    add("Hotel – Zimmer", data["hotel"]["zimmer"])
+    add("Hotel – Beschreibung", data["hotel"]["beschreibung"])
+    add("Hotel – Betten", data["hotel"]["betten"])
+    add("Hotel – Preis", data["hotel"]["preis"])
+    add("Hotel – Board", data["hotel"]["board"])
+    add("Hotel – Storno", data["hotel"]["refund"])
+
+    doc.build(content)
+
+    return send_file(filename, as_attachment=True)
+
 
 
 if __name__ == "__main__":

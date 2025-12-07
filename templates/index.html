@@ -1,274 +1,509 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
-  <title>Flüge & Hotels Suche</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Flüge & Hotels Suche — Demo</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    .flight-card, .hotel-card { border: 1px solid #ccc; padding: 10px; margin-bottom: 15px; }
-    .segment, .angebot-block { margin-left: 15px; }
-    h2 { color: #333; }
-    input[type="button"] {padding: 5px 10px; margin-top: 10px; }
+    :root{
+      --bg:#0f1720;
+      --panel:#111827;
+      --muted:#94a3b8;
+      --accent:#60a5fa;
+      --card:#0b1220;
+      --glass: rgba(255,255,255,0.03);
+      --success:#34d399;
+      --danger:#f87171;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: Inter, Roboto, Arial, sans-serif;
+      background:linear-gradient(180deg,#071024 0%, #081122 100%);
+      color:#e6eef8;
+      min-height:100vh;
+      display:flex;
+    }
+
+    /* Sidebar */
     .sidenav {
-      width: 130px;
-      position: fixed;
-      z-index: 1;
-      top: 20px;
-      right: 10px;
-      background: #eee;
-      overflow-x: hidden;
-      padding: 8px 0;
+      width:360px;
+      min-width:300px;
+      max-width:38%;
+      background: linear-gradient(180deg, rgba(17,24,39,0.98), rgba(7,10,18,0.95));
+      box-shadow: 0 8px 24px rgba(2,6,23,0.6);
+      padding:18px;
+      position:sticky;
+      top:18px;
+      height:calc(100vh - 36px);
+      overflow-y:auto;
+      border-left:1px solid rgba(255,255,255,0.03);
     }
 
-    .sidenav a {
-      padding: 6px 8px 6px 16px;
-      text-decoration: none;
-      font-size: 25px;
-      color: #2196F3;
-      display: block;
+    .logo {
+      font-weight:700;
+      font-size:18px;
+      color:var(--accent);
+      margin-bottom:12px;
     }
 
-    .sidenav a:hover { color: #064579; }
+    .side-section {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      padding:12px;
+      border-radius:12px;
+      margin-bottom:12px;
+      border:1px solid rgba(255,255,255,0.03);
+    }
 
-    .main {
-      margin-left: 140px;
-      font-size: 28px;
-      padding: 0px 10px;
+    .side-section h3 {
+      margin:0 0 8px 0;
+      font-size:14px;
+      color:#cfe7ff;
+    }
+
+    .side-row { font-size:13px; color:var(--muted); margin:6px 0; }
+    .side-row strong { color:#dbeafe; display:inline-block; width:110px; }
+
+    .stops { margin-top:6px; font-size:13px; color:#dbeafe; }
+
+    .chip { display:inline-block; padding:4px 8px; border-radius:999px; background:rgba(96,165,250,0.12); color:var(--accent); font-size:12px; margin-right:6px; }
+
+    /* Content */
+    .content {
+      flex:1;
+      padding:28px;
+      overflow-y:auto;
+    }
+
+    h1{ margin-top:0; color:#ebf8ff; font-size:22px; }
+
+    form { background:var(--glass); padding:12px; border-radius:10px; margin-bottom:14px; border:1px solid rgba(255,255,255,0.02); }
+    form label{ font-size:13px; color:var(--muted); margin-right:6px; display:inline-block; width:110px; }
+    form input[type=text], form input[type=date], form input[type=number]{
+      padding:6px 8px; border-radius:6px; background:transparent; border:1px solid rgba(255,255,255,0.04); color:#e6eef8;
+    }
+    button, input[type=submit], input[type=button]{
+      background:var(--accent); color:#03203a; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:600;
+    }
+
+    /* result cards */
+    .grid { display:grid; gap:12px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+    .flight-card, .hotel-card { background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.03); color:#dbeafe; }
+    .flight-card .segments { margin-top:8px; }
+    .segment-row { display:flex; gap:8px; align-items:center; font-size:13px; color:#cfe7ff; padding:6px 0; border-bottom:1px dashed rgba(255,255,255,0.02); }
+    .segment-row:last-child{ border-bottom:none; }
+    .segment-number { width:120px; font-weight:700; color:var(--accent); }
+    .segment-fromto { flex:1; font-size:13px; color:#e6eef8; }
+
+    .hotel-card .offer { background: rgba(255,255,255,0.01); padding:8px; border-radius:8px; margin-top:8px; border:1px solid rgba(255,255,255,0.02); }
+    .small { font-size:12px; color:var(--muted); }
+
+    .save-btn { background:linear-gradient(90deg,var(--accent), #3b82f6); color:#031022; padding:6px 10px; border-radius:8px; border:none; cursor:pointer; font-weight:700; }
+
+    /* footer */
+    .muted-note { color:var(--muted); font-size:12px; margin-top:10px; }
+
+    /* responsive */
+    @media (max-width:900px){
+      .sidenav{ position:static; width:100%; max-width:100%; height:auto; order:2; margin-top:12px; }
+      body{ flex-direction:column; }
     }
   </style>
 </head>
-
 <body>
 
-<div class="layout">
-
-  <div class="sidenav">
-    <div class="flight-safe">
-      <p><strong>Hinflug:</strong> <span id="Hinflug_Flight_Departure_1"></span></p>
-      <div class="segment">
-        <p><strong>Flugnummer:</strong> <span id="Hinflug_Flight_Number_1"></span></p>
-        <p><strong>Von:</strong> <span id="Hinflug_Flight_From_1"></span></p>
-        <p><strong>Nach:</strong> <span id="Hinflug_Flight_To_1"></span></p>
-        <p><strong>Preis:</strong> <span id="Hinflug_Flight_Price_1"></span></p>
-      </div>
-    
-      <div class="hotel-safe">
-        <p><strong>Hotel Check In:</strong> <span id="Hotel_CheckIn"></span></p>
-        <div class="segment">
-          <p><strong>Hotel:</strong> <span id="Hotel_Name"></span></p>
-          <p><strong>Adresse:</strong> <span id="Hotel_Beschriebung"></span></p>
-          <p><strong>Preis:</strong> <span id="Hotel_Preis"></span></p>
-        </div>
-        <p><strong>Hotel Check Out:</strong> <span id="Hotel_CheckOut"></span></p>
-      </div>
-
-      <p><strong>Rückflug:</strong> <span id="Rückflug_Flight_Departure_1"></span></p>
-      <div class="segment">
-        <p><strong>Flugnummer:</strong> <span id="Rückflug_Flight_Number_1"></span></p>
-        <p><strong>Von:</strong> <span id="Rückflug_Flight_From_1"></span></p>
-        <p><strong>Nach:</strong> <span id="Rückflug_Flight_To_1"></span></p>
-        <p><strong>Preis:</strong> <span id="Rückflug_Flight_Price_1"></span></p>
-      </div>
-
-
-    </div>  
-  </div>
-
-
   <div class="content">
-
     <h1>Suchergebnisse</h1>
 
-    <!-- FORMULARE -->
-    <form action="/flight_list" method="get">
-      <h3>Flugsuche</h3>
+    <!-- FORMULARE (einfach gehalten) -->
+    <form id="flightForm" action="/flight_list" method="get">
+      <h3 style="margin:0 0 8px 0;color:#cfe7ff">Flugsuche</h3>
       <label>Abflugstadt:</label><input type="text" name="origin" required>
-      <label>Zielstadt:</label><input type="text" name="destination" required>
-      <label>Abflugdatum:</label><input type="date" name="departureDate" required>
-      <label>Rückflugdatum:</label><input type="date" name="returnDate">
-      <label>Nur Hinflug:</label><input type="checkbox" name="oneWay" value="true">
+      <label>Zielstadt:</label><input type="text" name="destination" required><br><br>
+      <label>Abflug:</label><input type="date" name="departureDate" required>
+      <label>Rückflug:</label><input type="date" name="returnDate">
+      <label>Nur Hinflug:</label><input type="checkbox" name="oneWay" value="true"><br><br>
       <input type="hidden" name="action" value="flight">
       <button type="submit">Flüge suchen</button>
     </form>
 
-    <form action="/hotel_list" method="get">
-      <h3>Hotelsuche</h3>
+    <form id="hotelForm" action="/hotel_list" method="get">
+      <h3 style="margin:0 0 8px 0;color:#cfe7ff">Hotelsuche</h3>
       <label>Stadt:</label><input type="text" name="hotelCity" required>
-      <label>Radius (km):</label><input type="number" name="radius" value="5">
-      <label>Bewertung:</label><input type="number" name="rating" min="1" max="5">
       <label>Gäste:</label><input type="number" name="hotelGuests" value="1">
-      <label>Zimmer:</label><input type="number" name="hotelRoom" value="1">
+      <label>Zimmer:</label><input type="number" name="hotelRoom" value="1"><br><br>
       <label>Check-In:</label><input type="date" name="hotelCheckIn" required>
-      <label>Check-Out:</label><input type="date" name="hotelCheckOut" required>
+      <label>Check-Out:</label><input type="date" name="hotelCheckOut" required><br><br>
       <input type="hidden" name="action" value="hotel">
       <button type="submit">Hotels suchen</button>
     </form>
 
-    <hr>
+    <hr style="border:0;height:1px;background:rgba(255,255,255,0.03);margin:14px 0">
 
-    <div id="results"></div>
+    <div id="results" class="grid"></div>
+
+    <p class="muted-note">Hinweis: Ergebnisse werden vom Backend gefüllt (Flüge/Hotels).</p>
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidenav" id="sidebar">
+    <div class="logo">SmartTrip</div>
+
+    <div class="side-section" id="side-flight">
+      <h3>Gespeicherter Flug</h3>
+      <div class="side-row"><strong>Hinflug Datum:</strong><span id="Hinflug_Flight_Departure_1">—</span></div>
+      <div class="side-row"><strong>Hinflug Preis:</strong><span id="Hinflug_Flight_Price_1">—</span></div>
+      <div class="side-row"><strong>Hinflug Segmente:</strong></div>
+      <div id="Hinflug_Stops" class="stops small">—</div>
+
+      <hr style="border:0;height:1px;background:rgba(255,255,255,0.03);margin:12px 0">
+
+      <div class="side-row"><strong>Rückflug Datum:</strong><span id="Rückflug_Flight_Departure_1">—</span></div>
+      <div class="side-row"><strong>Rückflug Preis:</strong><span id="Rückflug_Flight_Price_1">—</span></div>
+      <div class="side-row"><strong>Rückflug Segmente:</strong></div>
+      <div id="Rückflug_Stops" class="stops small">—</div>
+    </div>
+
+    <div class="side-section" id="side-hotel">
+      <h3>Gespeichertes Hotel</h3>
+      <div class="side-row"><strong>Name:</strong><span id="Hotel_Name">—</span></div>
+      <div class="side-row"><strong>Adresse:</strong><span id="Hotel_Address">—</span></div>
+      <div class="side-row"><strong>Check-In:</strong><span id="Hotel_CheckIn">—</span></div>
+      <div class="side-row"><strong>Check-Out:</strong><span id="Hotel_CheckOut">—</span></div>
+      <div class="side-row"><strong>Zimmer:</strong><span id="Hotel_RoomType">—</span></div>
+      <div class="side-row"><strong>Beschreibung:</strong><div id="Hotel_Desc" class="small">—</div></div>
+      <div class="side-row"><strong>Bett/Count:</strong><span id="Hotel_Beds">—</span></div>
+      <div class="side-row"><strong>Preis:</strong><span id="Hotel_Preis">—</span></div>
+      <div class="side-row"><strong>Board:</strong><span id="Hotel_Board">—</span></div>
+      <div class="side-row"><strong>Storno:</strong><span id="Hotel_Refund">—</span></div>
+      <div style="margin-top:8px;"><button id="downloadPdf" style="margin-top:10px;background:var(--accent);color:#000;padding:8px 10px;border-radius:8px;border:none;cursor:pointer">Export PDF</button></div>
+    </div>
+
+    <div style="height:18px"></div>
+</button>
+
+  </aside>
 
 <script>
-  const flights = {{ flights|tojson }};
-  const hotels = {{ hotels|tojson }};
-  const angebote_pro_hotel = {{ angebote_pro_hotel|tojson }};
-  const search_done = {{ search_done|tojson }};
+/*
+  WICHTIG:
+  - Flask muss die folgenden Variablen korrekt rendern.
+  - Nutze im Template:
+      const flights = {{ flights|tojson | safe }} || [];
+      const hotels = {{ hotels|tojson | safe }} || [];
+      const angebote_pro_hotel = {{ angebote_pro_hotel|tojson | safe }} || {};
+      const search_done = {{ search_done|tojson | safe }} || false;
+*/
 
-  function renderResults(search_done, flights, hotels, angebote_pro_hotel) {
-    let html = "";
+const flights = {{ flights|tojson | safe }} || [];
+const hotels = {{ hotels|tojson | safe }} || [];
+const angebote_pro_hotel = {{ angebote_pro_hotel|tojson | safe }} || {};
+const search_done = {{ search_done|tojson | safe }} || false;
 
-    if (!search_done) return "";
+/* ---------------------------
+   RENDER RESULTS
+   --------------------------- */
+function safeGet(obj, path, fallback = "—") {
+  try {
+    return path.split('.').reduce((o,k)=> (o && o[k] !== undefined) ? o[k] : undefined, obj) ?? fallback;
+  } catch(e) { return fallback; }
+}
 
-    /* ==========================
-       FLÜGE ANZEIGEN
-    ========================== */
-    if (flights && flights.length > 0) {
-      html += "<h2>Gefundene Flüge:</h2>";
+function formatDateTime(dt) {
+  if(!dt) return "—";
+  // dt expected ISO string, show date + time
+  const d = new Date(dt);
+  if (isNaN(d)) return dt;
+  return d.toLocaleString('de-DE', { dateStyle: 'short', timeStyle: 'short' });
+}
 
-      flights.forEach((flight, i) => {
-        html += `<div class="flight-card">`;
+function renderResults(search_done, flights, hotels, angebote_pro_hotel) {
+  let html = "";
+  if (!search_done) return "<div class='muted-note' style='grid-column:1/-1'>Keine Suche ausgeführt.</div>";
 
-        flight.itineraries.forEach((itinerary, j) => {
-          html += `<p><strong>Reisedauer:</strong> ${itinerary.duration}</p>`;
+  // FLÜGE
+  if (flights && flights.length > 0) {
+    flights.forEach((flight, i) => {
+      html += `<div class="flight-card">`;
+      html += `<div style="display:flex;justify-content:space-between;align-items:center"><div><strong>${safeGet(flight,'itineraries[0].duration','-')}</strong></div></div>`;
 
-          itinerary.segments.forEach(segment => {
-            html += `
-              <div class="segment">
-                <p><strong>Flugnummer:</strong> ${segment.carrierCode} ${segment.number}</p>
-                <p><strong>Abflug:</strong> ${segment.departure.iataCode} – ${segment.departure.at}</p>
-                <p><strong>Ankunft:</strong> ${segment.arrival.iataCode} – ${segment.arrival.at}</p>
-                <p><strong>Dauer:</strong> ${segment.duration}</p>
-              </div>
-            `;
-          });
-
-        html += `<p><strong>Endpreis:</strong> ${flight.price.total} ${flight.price.currency}</p>`;
+      flight.itineraries.forEach((itinerary, j) => {
+        html += `<div class="segments">`;
+        itinerary.segments.forEach((segment, s) => {
+          // Darstellung: Flugnummer -> Abflug -> Ankunft
+          const number = `${safeGet(segment,'carrierCode','')}${safeGet(segment,'number','')}`.trim();
+          const dep = `${safeGet(segment,'departure.iataCode','')} (${formatDateTime(segment.departure?.at)})`;
+          const arr = `${safeGet(segment,'arrival.iataCode','')} (${formatDateTime(segment.arrival?.at)})`;
+          html += `<div class="segment-row">
+                    <div class="segment-number">${number || '—'}</div>
+                    <div class="segment-fromto">${dep} → ${arr}</div>
+                   </div>`;
         });
-               /* FIXED: sichere Übergabe */
-        html += `<input type="button" id="myBtn2"
-                   onclick="saveFlight(flights[${i}])"
-                   value="Speichern">`;
-        html += `</div>`;
+        html += `</div>`; // segments
       });
 
-      return html;
-    }
+      html += `<div style="margin-top:8px" class="small">Preis gesamt: ${safeGet(flight,'price.total','-')} ${safeGet(flight,'price.currency','')}</div>`;
+      /* FIXED: data-flight-index uses i (nicht fi) */
+      html += `<button class='save-btn' data-flight-index='${i}'>Flug speichern (Hin + Rück)</button>`;
+      html += `</div>`; // flight-card
+    });
+  }
 
-    /* ==========================
-       HOTELS ANZEIGEN
-    ========================== */
-    if (hotels && hotels.length > 0) {
-      html += "<h2>Gefundene Hotels mit verfügbaren Zimmern:</h2>";
-      hotels.forEach(hotel => {
-        const angebote = angebote_pro_hotel[hotel.hotelId] || [];
-        const hatZimmer = angebote.some(o => o.offers && o.offers.length > 0);
+  // HOTELS
+  if (hotels && hotels.length > 0) {
+    hotels.forEach(hotel => {
+      const hotelId = safeGet(hotel, 'hotelId', hotel?.hotelId || hotel?.id || 'unknown');
+      const offers = angebote_pro_hotel[hotelId] || [];
+      if (!offers.length) return;
 
-        if (!hatZimmer) return;
+      html += `<div class="hotel-card">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <div>
+                    <strong>${safeGet(hotel,'name','Hotel')}</strong><br>
+                    <span class="small">${safeGet(hotel,'address.lines[0]','')}, ${safeGet(hotel,'address.cityName','')}</span>
+                  </div>
+                </div>`;
 
-        html += `<div class="hotel-card">
-          <p><strong>Name:</strong> ${hotel.name}</p>
-          <p><strong>Bewertung:</strong> ${hotel.rating} Sterne</p>
-          <p><strong>Adresse:</strong> ${hotel.address.lines[0]}, ${hotel.address.cityName}</p>
-          <p><strong>Entfernung:</strong> ${hotel.distance.value} ${hotel.distance.unit}</p>
-          <p><strong>Angebote:</strong></p>
-        `;
+      // show multiple offers
+      offers.forEach((block, blockIndex) => {
+        (block.offers || []).forEach((offer, offerIndex) => {
+          const price = safeGet(offer,'price.total','-');
+          const currency = safeGet(offer,'price.currency','');
+          const roomDesc = (safeGet(offer,'room.description.text', safeGet(offer,'roomInformation.description','-')) + '').replace(/\n/g,'<br>');
+          const roomCat = safeGet(offer,'room.typeEstimated.category', safeGet(offer,'room.typeEstimated','-'));
+          const bedType = safeGet(offer,'room.typeEstimated.bedType', '-');
+          const beds = safeGet(offer,'room.typeEstimated.beds', '-');
+          const board = safeGet(offer,'boardType','-');
+          const checkIn = safeGet(offer,'checkInDate','-');
+          const checkOut = safeGet(offer,'checkOutDate','-');
 
-        angebote.forEach(offer => {
-          if (!offer.offers) return;
+          // availability: try several properties; if none, show 'Ja' (block-level available exists)
+          const availability = (offer.availability ?? offer.available ?? block.available ?? true);
+          const availText = (typeof availability === 'number') ? `${availability} Zimmer` : (availability ? 'Ja' : 'Nein');
 
-          offer.offers.forEach(einzelangebot => {
-            html += `<div class="angebot-block">`;
+          // refund/policy
+          const refund = safeGet(offer,'policies.refundable.cancellationRefund', safeGet(offer,'policies.refundable','-'));
 
-            html += `<input type="button" id="myBtn"
-                     onclick="myFunction('${hotel.name};${einzelangebot.price.total}',
-                                          '${hotel.address.lines[0]}, ${hotel.address.cityName}',
-                                          '${einzelangebot.checkInDate}',
-                                          '${einzelangebot.checkOutDate}')"
-                     value="Speichern">`;
-
-            if (einzelangebot.room.typeEstimated) {
-              html += `<p><strong>Bett:</strong> ${einzelangebot.room.typeEstimated.bedType} × ${einzelangebot.room.typeEstimated.beds}</p>`;
-            }
-
-            html += `<p><strong>Preis:</strong> ${einzelangebot.price.total} €</p><hr>`;
-            html += `</div>`;
-          });
+          html += `<div class="offer">
+                    <div style="display:flex;justify-content:space-between;align-items:center">
+                      <div>
+                        <div style="font-weight:700">${roomCat} • ${board}</div>
+                        <div class="small">${roomDesc}</div>
+                        <div class="small" style="margin-top:6px">Bett: ${bedType} × ${beds} • Gäste: ${safeGet(offer,'guests.adults','-')}</div>
+                        <div class="small">CheckIn: ${checkIn} — CheckOut: ${checkOut}</div>
+                      </div>
+                      <div style="text-align:right">
+                        <div style="font-weight:800">${price} ${currency}</div>
+                        <div class="small">Verfügbar: ${availText}</div>
+                        <div style="margin-top:8px">
+                          <button class="save-hotel-btn save-btn" 
+                                  data-hotel-id="${hotelId}"
+                                  data-offer-block="${blockIndex}"
+                                  data-offer-index="${offerIndex}">
+                            Hotel speichern
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>`; // offer
         });
-
-        html += `</div>`;
       });
 
-      return html;
+      html += `</div>`; // hotel-card
+    });
+  }
+
+  if (!html) html = "<div class='muted-note' style='grid-column:1/-1'>Keine Ergebnisse gefunden.</div>";
+  return html;
+}
+
+/* ---------------------------
+   SAVE / LOAD LOGIC (localStorage)
+   --------------------------- */
+function saveFlightFromDataset(flightIndex) {
+  const f = flights[flightIndex];
+  if (!f) return;
+
+  const hin = f.itineraries?.[0] || {segments:[]};
+  const rueck = f.itineraries?.[1] || {segments:[]};
+
+  const data = {
+    hinflugSegments: hin.segments || [],
+    rueckflugSegments: rueck.segments || [],
+    price: f.price?.total,
+    currency: f.price?.currency
+  };
+
+  localStorage.setItem("savedFlight", JSON.stringify(data));
+  loadSidebar();
+}
+
+function saveHotelFromDataset(hotelId, blockIndex, offerIndex) {
+  const offersForHotel = angebote_pro_hotel[hotelId] || [];
+  const block = offersForHotel[blockIndex];
+  if (!block) return alert("Hotel-Block nicht gefunden");
+  const offer = (block.offers || [])[offerIndex];
+  if (!offer) return alert("Offer nicht gefunden");
+
+  // Attempt to build full hotel data (we need hotel details from `hotels` array)
+  const hotelObj = hotels.find(h => (h.hotelId === hotelId) || (h.id === hotelId) || (h.hotelId === hotelId)) || {};
+
+  const payload = {
+    hotelId,
+    name: hotelObj.name || hotelObj.hotelName || 'Hotel',
+    address: {
+      lines: hotelObj.address?.lines || [],
+      postalCode: hotelObj.address?.postalCode || '',
+      cityName: hotelObj.address?.cityName || '',
+      countryCode: hotelObj.address?.countryCode || ''
+    },
+    offer: {
+      id: offer.id || null,
+      price: offer.price || {},
+      room: offer.room || offer.roomInformation || {},
+      boardType: offer.boardType || '-',
+      checkInDate: offer.checkInDate || '-',
+      checkOutDate: offer.checkOutDate || '-',
+      availability: (offer.availability ?? block.available ?? true),
+      policies: offer.policies || {}
     }
+  };
 
-    return "<p>Keine Flüge oder Hotels gefunden.</p>";
+  localStorage.setItem('savedHotel', JSON.stringify(payload));
+  loadSidebar();
+}
+
+/* ---------------------------
+   LOAD SIDEBAR
+   --------------------------- */
+function formatFullAddress(addrObj) {
+  if (!addrObj) return "—";
+  const parts = [];
+  if (addrObj.lines && addrObj.lines.length) parts.push(addrObj.lines.join(", "));
+  if (addrObj.postalCode) parts.push(addrObj.postalCode);
+  if (addrObj.cityName) parts.push(addrObj.cityName);
+  if (addrObj.countryCode) parts.push(addrObj.countryCode);
+  return parts.join(", ");
+}
+
+function loadSidebar() {
+  // Clear fields first (avoid appending duplicates)
+  document.getElementById("Hinflug_Stops").innerHTML = "—";
+  document.getElementById("Rückflug_Stops").innerHTML = "—";
+
+  const savedFlight = JSON.parse(localStorage.getItem('savedFlight') || 'null');
+  if (savedFlight) {
+    // HINFLUG
+    const hin = savedFlight.hinflugSegments || [];
+    document.getElementById("Hinflug_Flight_Price_1").innerText = (savedFlight.price ? savedFlight.price + " " + (savedFlight.currency || '') : '—');
+    document.getElementById("Hinflug_Flight_Departure_1").innerText = hin[0]?.departure?.at ? new Date(hin[0].departure.at).toLocaleDateString('de-DE') : "—";
+    document.getElementById("Hinflug_Stops").innerHTML = hin.map((s,i)=>{
+      return `<div>${s.carrierCode||''}${s.number||''} : ${s.departure?.iataCode||''} → ${s.arrival?.iataCode||''}</div>`;
+    }).join("") || '—';
+
+    // RÜCKFLUG
+    const rueck = savedFlight.rueckflugSegments || [];
+    document.getElementById("Rückflug_Flight_Price_1").innerText = (savedFlight.price ? savedFlight.price + " " + (savedFlight.currency || '') : '—');
+    document.getElementById("Rückflug_Flight_Departure_1").innerText = rueck[0]?.departure?.at ? new Date(rueck[0].departure.at).toLocaleDateString('de-DE') : "—";
+    document.getElementById("Rückflug_Stops").innerHTML = rueck.map((s,i)=>{
+      return `<div>${s.carrierCode||''}${s.number||''} : ${s.departure?.iataCode||''} → ${s.arrival?.iataCode||''}</div>`;
+    }).join("") || '—';
   }
 
-  /* ==========================
-     HOTEL SPEICHERN
-  ========================== */
-  function myFunction(parms, parm2, parm3, parm4) {
-    let parts = parms.split(";");
-
-    document.getElementById("Hotel_CheckIn").innerHTML = parm3;
-    document.getElementById("Hotel_Name").innerHTML = parts[0];
-    document.getElementById("Hotel_Beschriebung").innerHTML = parm2;
-    document.getElementById("Hotel_Preis").innerHTML = parts[1];
-    document.getElementById("Hotel_CheckOut").innerHTML = parm4;
+  // hotel
+  const savedHotel = JSON.parse(localStorage.getItem('savedHotel') || 'null');
+  if (savedHotel) {
+    document.getElementById("Hotel_Name").innerText = savedHotel.name || '—';
+    document.getElementById("Hotel_Address").innerText = formatFullAddress(savedHotel.address) || '—';
+    document.getElementById("Hotel_CheckIn").innerText = savedHotel.offer?.checkInDate || '—';
+    document.getElementById("Hotel_CheckOut").innerText = savedHotel.offer?.checkOutDate || '—';
+    document.getElementById("Hotel_RoomType").innerText = safeGet(savedHotel,'offer.room.typeEstimated.category', safeGet(savedHotel,'offer.room.type','-'));
+    // description
+    const desc = safeGet(savedHotel,'offer.room.description.text', safeGet(savedHotel,'offer.room.description', '-'));
+    document.getElementById("Hotel_Desc").innerHTML = (desc || '-').toString().replace(/\n/g,'<br>');
+    const bedType = safeGet(savedHotel,'offer.room.typeEstimated.bedType','-');
+    const beds = safeGet(savedHotel,'offer.room.typeEstimated.beds','-');
+    document.getElementById("Hotel_Beds").innerText = `${bedType} × ${beds}`;
+    const priceStr = (savedHotel.offer?.price?.total ? `${savedHotel.offer.price.total} ${savedHotel.offer.price.currency || ''}` : '-');
+    document.getElementById("Hotel_Preis").innerText = priceStr;
+    document.getElementById("Hotel_Board").innerText = savedHotel.offer?.boardType || '-';
+    document.getElementById("Hotel_Refund").innerText = safeGet(savedHotel,'offer.policies.refundable.cancellationRefund','-');
   }
+}
 
-  /* ==========================
-     FLUG SPEICHERN
-  ========================== */
-  function saveFlight(flights) {
-
-    const Hinflug = flights.itineraries[0];
-
-    const Rückflug = flights.itineraries[1];
-
-   const Hinflug_segment_1 = Hinflug.segments[0]; 
-   const Rückflug_segment_1 = Rückflug.segments[0]; 
-
-    document.getElementById("Hinflug_Flight_Number_1").innerHTML =
-      Hinflug_segment_1.carrierCode + " " + Hinflug_segment_1.number;
-
-    document.getElementById("Hinflug_Flight_From_1").innerHTML =
-      Hinflug_segment_1.departure.iataCode + " – " + Hinflug_segment_1.departure.at;
-
-    document.getElementById("Hinflug_Flight_To_1").innerHTML =
-      Hinflug_segment_1.arrival.iataCode + " – " + Hinflug_segment_1.arrival.at;
-
-    document.getElementById("Hinflug_Flight_Departure_1").innerHTML =
-      Hinflug_segment_1.departure.at.substring(0, 10);
-
-    document.getElementById("Hinflug_Flight_Price_1").innerHTML =
-      "Preis wird oben angezeigt";
-
-
-    document.getElementById("Rückflug_Flight_Number_1").innerHTML =
-      Rückflug_segment_1.carrierCode + " " + Rückflug_segment_1.number;
-
-    document.getElementById("Rückflug_Flight_From_1").innerHTML =
-      Rückflug_segment_1.departure.iataCode + " – " + Rückflug_segment_1.departure.at;
-
-    document.getElementById("Rückflug_Flight_To_1").innerHTML =
-      Rückflug_segment_1.arrival.iataCode + " – " + Rückflug_segment_1.arrival.at;
-
-    document.getElementById("Rückflug_Flight_Departure_1").innerHTML =
-      Rückflug_segment_1.departure.at.substring(0, 10);
-
-    document.getElementById("Rückflug_Flight_Price_1").innerHTML =
-      "Preis wird oben angezeigt";
-
-
+/* ---------------------------
+   EVENT DELEGATION: result buttons
+   --------------------------- */
+document.addEventListener('click', function(e){
+  const el = e.target;
+  if (el.matches('.save-btn[data-flight-index]')) {
+    const fi = parseInt(el.dataset.flightIndex, 10);
+    saveFlightFromDataset(fi);
+    return;
   }
+  if (el.matches('.save-hotel-btn')) {
+    const hotelId = el.dataset.hotelId;
+    const blockIndex = parseInt(el.dataset.offerBlock || 0,10);
+    const offerIndex = parseInt(el.dataset.offerIndex || 0,10);
+    saveHotelFromDataset(hotelId, blockIndex, offerIndex);
+    return;
+  }
+  if (el.id === 'clearSaved') {
+    localStorage.removeItem('savedFlight');
+    localStorage.removeItem('savedHotel');
+    loadSidebar();
+    return;
+  }
+});
 
-  document.getElementById("results").innerHTML =
-    renderResults(search_done, flights, hotels, angebote_pro_hotel);
+/* ---------------------------
+   INIT
+   --------------------------- */
+document.getElementById("results").innerHTML = renderResults(search_done, flights, hotels, angebote_pro_hotel);
+loadSidebar();
+
+document.getElementById("downloadPdf").addEventListener("click", function () {
+    const payload = {
+        hinflug: {
+            datum: document.getElementById("Hinflug_Flight_Departure_1").innerText,
+            preis: document.getElementById("Hinflug_Flight_Price_1").innerText,
+            segmente: document.getElementById("Hinflug_Stops").innerText
+        },
+        rueckflug: {
+            datum: document.getElementById("Rückflug_Flight_Departure_1").innerText,
+            preis: document.getElementById("Rückflug_Flight_Price_1").innerText,
+            segmente: document.getElementById("Rückflug_Stops").innerText
+        },
+        hotel: {
+            name: document.getElementById("Hotel_Name").innerText,
+            adresse: document.getElementById("Hotel_Address").innerText,
+            checkin: document.getElementById("Hotel_CheckIn").innerText,
+            checkout: document.getElementById("Hotel_CheckOut").innerText,
+            zimmer: document.getElementById("Hotel_RoomType").innerText,
+            beschreibung: document.getElementById("Hotel_Desc").innerText,
+            betten: document.getElementById("Hotel_Beds").innerText,
+            preis: document.getElementById("Hotel_Preis").innerText,
+            board: document.getElementById("Hotel_Board").innerText,
+            refund: document.getElementById("Hotel_Refund").innerText
+        }
+    };
+
+    fetch("/download_pdf", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(payload)
+    })
+    .then(r => r.blob())
+    .then(blob => {
+        let url = window.URL.createObjectURL(blob);
+        let a = document.createElement("a");
+        a.href = url;
+        a.download = "reise_details.pdf";
+        a.click();
+    });
+});
+
 </script>
-
-  </div>
-</div>
 
 </body>
 </html>
